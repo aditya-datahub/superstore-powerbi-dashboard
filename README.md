@@ -1,6 +1,12 @@
-# 📊 Superstore Sales Dashboard — Power BI
+# 📊 Superstore Sales Dashboard | Power BI
 
 > **An interactive 6-page Power BI dashboard built for a regional sales company to analyze business performance, track category-wise targets, monitor returns, and evaluate delivery health across regions and managers.**
+
+---
+
+## 📎 Dashboard File
+
+> 🔗 **[Download & View PBIX File — Google Drive](https://drive.google.com/file/d/1b1rQ88_AemSC-StkUzTXPZjc1FcSLVk9/view?usp=drive_link)**
 
 ---
 
@@ -30,7 +36,8 @@ Leadership needed a dashboard that could be used in **monthly business reviews**
 **Key Findings (2018):**
 - Total Sales: **1.04M** ↑ 36.16% vs 2017
 - Total Profit: **128.94K** ↑ 30.93% vs 2017
-- Technology is the top-selling category
+- Total Orders: **1,538** ↑ 26.69% vs 2017
+- Technology is the top-selling category at **1.11M**
 
 ---
 
@@ -40,12 +47,13 @@ Leadership needed a dashboard that could be used in **monthly business reviews**
 **Questions answered:**
 - Which region is performing best?
 - Which manager is driving the most sales?
-- How is each manager performing across categories?
+- How is each manager performing across product categories?
 
 **Key Findings:**
-- **Emily Burns (Central)** — top performer at 1.72M
-- **Central region** leads all regions consistently
-- Green/Red matrix shows category-level breakdown per manager
+- **Emily Burns (Central)** — top performer at **1.72M**
+- **Ross DeVincentis (North)** — **0.63M**
+- **Damala Kotsonis (South)** — **0.59M**
+- Central region leads all regions consistently
 
 ---
 
@@ -55,11 +63,27 @@ Leadership needed a dashboard that could be used in **monthly business reviews**
 **Questions answered:**
 - Are sales targets being achieved by category?
 - Which category is underperforming vs target?
+- How have targets changed year over year?
 
-**Key Findings (2018):**
-- Technology: **148%** ✅ — exceeding target
-- Office Supplies: **140%** ✅ — exceeding target
-- Furniture: **92%** ⚠️ — **only category missing target**
+**Key Findings (2018 — Target = 570K):**
+- Technology: **1.11M sales vs 0.75M target** ✅ — exceeding
+- Office Supplies: **1.05M sales vs 0.75M target** ✅ — exceeding
+- Furniture: **0.78M sales vs 0.85M target** ⚠️ — **only category below target**
+
+---
+
+### Page 4 — Returns Analysis
+![Returns Analysis](images/4.png)
+
+**Questions answered:**
+- Are returns increasing compared to last year?
+- Which category and region has the most returns?
+
+**Key Findings:**
+- Total Returns: **637** — Rate: **13.86%**
+- **Office Supplies** has the highest returns: **557**
+- **Central region** has the most returns: **382**
+- Return rate slightly increased vs last year ⚠️
 
 ---
 
@@ -72,9 +96,10 @@ Leadership needed a dashboard that could be used in **monthly business reviews**
 - Are any regions consistently slow?
 
 **Key Findings:**
-- Standard Class = **5.0 days** (slowest)
-- Same Day = **0 days** (fastest)
-- Delivery improved from 4.05 days (2016) → 3.99 days (2018) ✅
+- Standard Class = **5.0 days** (slowest) ⚠️
+- Same Day = **0.0 days** (fastest) ✅
+- Delivery improved: 4.05 days (2016) → **3.99 days (2018)** ✅
+- All regions averaging ~4 days consistently
 
 ---
 
@@ -87,14 +112,16 @@ Leadership needed a dashboard that could be used in **monthly business reviews**
 |--------|-------|
 | Total Sales | 2.94M |
 | Total Profit | 372.83K |
+| Total Orders | 4,596 |
 | Target Achievement | 125.03% |
-| Sales Growth (YoY) | 54.97% |
+| Sales Growth YoY | 54.97% |
+| Profit Growth YoY | 52.87% |
 
-**Key Risks identified:**
-- 🔴 Furniture at 91.66% — only category missing target
-- 🔴 Return Rate at 14.63% — slightly higher than last year
-- 🟡 Standard Class delivery averages 5 days
-- 🟢 Technology leading at 148% — replicate this strategy!
+**Key Risks & Actions:**
+- 🔴 Furniture at **91.66%** — only category missing target. Needs immediate focus
+- 🔴 Return Rate at **14.63%** — slightly higher than last year. Monitor closely
+- 🟡 Standard Class delivery averages **5 days** — encourage faster shipping modes
+- 🟢 Technology leading at **148% achievement** — replicate this strategy across regions
 
 ---
 
@@ -102,7 +129,7 @@ Leadership needed a dashboard that could be used in **monthly business reviews**
 
 | File | Description |
 |------|-------------|
-| `order_2015.csv` to `order_2018.csv` | Sales orders across 4 years |
+| `order_2015.csv` to `order_2018.csv` | Sales orders across 4 years (appended) |
 | `People.csv` | Regional Manager → Region mapping |
 | `Returns.csv` | Returned order IDs |
 | `Target.csv` | Category-wise sales targets by year |
@@ -119,21 +146,25 @@ Orders ──── DateTable    (Order Date → Date)
 Target ──── Orders       (Category → Category)
 ```
 
-### DAX Measures Used
+### Key DAX Measures
 ```dax
-Total Sales = SUM(Orders[Sales])
-Sales LY = CALCULATE([Total Sales], SAMEPERIODLASTYEAR(DateTable[Date]))
-Sales YoY % = DIVIDE([Total Sales] - [Sales LY], [Sales LY], 0)
+Total Sales     = SUM(Orders[Sales])
+Total Profit    = SUM(Orders[Profit])
+Total Orders    = DISTINCTCOUNT(Orders[Order ID])
+Total Returns   = COUNTROWS(Returns)
 
-Total Target = CALCULATE(SUM(Target[Target Sales]),
-               FILTER(Target, Target[Year] = SELECTEDVALUE(DateTable[Year], 0)))
+Sales LY        = CALCULATE([Total Sales], SAMEPERIODLASTYEAR(DateTable[Date]))
+Sales YoY %     = DIVIDE([Total Sales] - [Sales LY], [Sales LY], 0)
+
+Total Target    = CALCULATE(SUM(Target[Target Sales]),
+                  FILTER(Target, Target[Year] = SELECTEDVALUE(DateTable[Year], 0)))
 
 Target Achievement % = DIVIDE([Total Sales], [Total Target], 0)
 
-Avg Delivery Days = AVERAGEX(Orders,
-                   DATEDIFF(Orders[Order Date], Orders[Ship Date], DAY))
+Avg Delivery Days    = AVERAGEX(Orders,
+                       DATEDIFF(Orders[Order Date], Orders[Ship Date], DAY))
 
-Return Rate % = DIVIDE([Total Returns], [Total Orders], 0)
+Return Rate %        = DIVIDE([Total Returns], [Total Orders], 0)
 ```
 
 ### Tools Used
@@ -176,17 +207,11 @@ superstore-powerbi-dashboard/
 
 ## 🚀 How to Use
 
-1. Download the `.pbix` file from the link below
-2. Open in **Power BI Desktop** (free download from Microsoft)
+1. Click the **Google Drive link** above to download the `.pbix` file
+2. Open in **Power BI Desktop** (free — download from Microsoft)
 3. Use the **Year slicer** on each page to filter by year
-4. Click on any bar/region to cross-filter all visuals on the page
-5. Navigate pages using the tabs at the bottom
-
----
-
-## 📎 Dashboard File
-
-> 🔗 **[Download PBIX File — Google Drive](#)** ← *(replace with your actual link)*
+4. Click any bar or region to **cross-filter** all visuals on the page
+5. Navigate pages using the **tabs at the bottom**
 
 ---
 
@@ -200,7 +225,7 @@ superstore-powerbi-dashboard/
 
 ## 📄 License
 
-This project is licensed under the MIT License — see [LICENSE](LICENSE) for details.
+MIT License — see [LICENSE](LICENSE) for details.
 
 ---
 
