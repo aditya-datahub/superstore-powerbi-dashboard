@@ -8,6 +8,8 @@
 
 > 🔗 **[Download & View PBIX File — Google Drive](https://drive.google.com/file/d/1b1rQ88_AemSC-StkUzTXPZjc1FcSLVk9/view?usp=drive_link)**
 
+> 🎥 **[Watch Dashboard Walkthrough Video — Google Drive](https://drive.google.com/file/d/1vwfNRLyC1ZNtXUjm7brwrYu0YC1iMp1g/view?usp=sharing)**
+
 ---
 
 ## 🏢 Business Problem
